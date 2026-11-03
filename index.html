@@ -306,20 +306,19 @@ T.perso={name:'Personnage',desc:'Présenter un personnage, une phrase par slide.
       out.push(slide(bg,fg,o));});
     return out;}};
 T.question={name:'Je réponds à vos questions',desc:'Une question, une réponse découpée en slides.',
-  def:()=>({question:'Pourquoi avoir choisi l’autoédition ?',photo:null,author:null,items:[
+  def:()=>({question:'Pourquoi avoir choisi l’autoédition ?',photo:null,author:null,frame:'beige',items:[
     {text:'J’ai choisi l’autoédition parce que je voulais garder ma liberté.'},
     {text:'J’avais envie de proposer mon ouvrage à un prix accessible et d’écrire à mon rythme.'},
     {text:'… de raconter mon histoire sans la déformer, et de la porter jusqu’au bout en toute fierté.'},
     {text:'Ce n’était pas forcément le chemin le plus simple… mais sans doute le bon choix pour moi.'}]}),
-  fields:[{k:'question',t:'text',l:'Question'},{k:'photo',t:'image',l:'Photo de la 1re slide'},{k:'author',t:'image',l:'Photo ronde de l’auteur (dernière slide)'},
+  fields:[{k:'question',t:'text',l:'Question'},{k:'frame',t:'seg',l:'Contour du post',o:[['aucun','Aucun'],['beige','Beige'],['bleu','Bleu']]},{k:'photo',t:'image',l:'Photo de la 1re slide'},{k:'author',t:'image',l:'Photo ronde de l’auteur (dernière slide)'},
     {k:'items',t:'list',l:'Réponse',item:'Partie',max:8,add:()=>({text:''}),sub:[{k:'text',t:'area',l:'Texte'}]}],
   slides(d,inv){const n=d.items.length, q=esc(d.question).replace(/ \?$/,'&nbsp;?');
     const L=inv?{q:C.B,qt:C.CR,ql:C.S,col:C.S,ct:C.B,cs:C.G,pb:C.B,pf:C.CR,wm:'rgba(46,110,146,.12)'}:{q:C.S,qt:C.B,ql:C.B,col:C.B,ct:C.CR,cs:C.S,pb:C.S,pf:C.B,wm:'rgba(251,246,236,.12)'};
     const a0=(d.items[0]||{}).text||'', s0=a0.length>110?54:62;
     let first=A(`left:0;top:0;width:540px;height:675px;padding:64px 60px;display:flex;flex-direction:column;justify-content:space-between;background:${L.q}`,
         K('Je réponds à vos questions',L.ql)+`<h1 style="margin:0;font-family:${FD};font-size:64px;font-weight:400;line-height:1.1;color:${L.qt}">${q}</h1><span></span>`)
-      +A(`left:0;top:675px;width:540px;height:675px;background:${inv?C.B:C.S}`,'')
-      +`<div style="position:absolute;left:36px;top:711px;width:468px;height:603px;border-radius:24px;overflow:hidden">${pic(d.photo,'inset:0','center')}</div>`
+      +pic(d.photo,'left:0;top:675px;width:540px;height:675px','center')
       +A(`left:540px;top:0;width:540px;height:1350px;padding:90px 60px 64px;display:flex;flex-direction:column;justify-content:space-between;background:${L.col}`,
         P(nl(a0),s0,L.ct,1.3)+`<div style="display:flex;align-items:center;justify-content:space-between">${page('1 / '+n,L.cs)}${pill('Glissez →',L.pb,L.pf)}</div>`)
       +`<span style="position:absolute;left:600px;top:560px;font-family:${FD};font-size:640px;line-height:1;color:${L.wm}">»</span>`;
@@ -335,6 +334,8 @@ T.question={name:'Je réponds à vos questions',desc:'Une question, une réponse
       o+=A('left:80px;right:80px;top:230px;bottom:160px;display:flex;flex-direction:column;justify-content:center;gap:44px',body);
       o+=A('left:80px;right:80px;bottom:64px;display:flex;justify-content:space-between;align-items:center',page(`${i+1} / ${n}`,sub)+pill(last?'Une question ? Posez-la en commentaire':'Glissez →',acc,bg));
       out.push(slide(bg,fg,o));}
+    if(d.frame&&d.frame!=='aucun'){const fc=d.frame==='bleu'?C.B:C.S;
+      return out.map(h=>slide(fc,C.N,`<div style="position:absolute;left:36px;top:45px;width:1008px;height:1260px;border-radius:24px;overflow:hidden"><div style="position:absolute;left:0;top:0;width:1080px;height:1350px;transform:scale(0.93333);transform-origin:0 0">${h.replace(/ data-edge="[^"]*"/,'')}</div></div>`));}
     return out;}};
 T.avis={name:'Avis des lecteurs',desc:'Les avis en bulles de message.',
   def:()=>({title:'Vos avis me touchent',teasers:'« un bout d’avis »\n« un autre, plus court »\n« et un troisième… »',items:[
