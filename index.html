@@ -167,6 +167,9 @@ h2{font-size:20px;line-height:1.2}
       <button class="btn" id="b-phone">Voir comme sur mon téléphone</button>
       <button class="btn" id="b-allblue">Tout en bleu</button>
       <button class="btn" id="b-allbeige">Tout en beige</button>
+      <button class="btn" id="b-export">Sauvegarder ma grille</button>
+      <label class="btn" for="imp-json">Charger une sauvegarde</label>
+      <input id="imp-json" type="file" accept=".json,application/json" hidden>
       <label class="btn" for="imp">Importer des posts déjà publiés</label>
       <input id="imp" type="file" accept="image/*" multiple hidden>
       <span class="muted" id="store-note"></span>
@@ -634,6 +637,36 @@ async function recolorAll(color){const btns=[$('#b-allblue'),$('#b-allbeige')];b
   toast((n?`${n} post${n>1?'s':''} passé${n>1?'s':''} ${color==='bleu'?'en bleu':'en beige'}.`:'Tous les posts sont déjà '+(color==='bleu'?'en bleu.':'en beige.'))+(skipped?' Les posts importés ou anciens ne changent pas.':''));}
 $('#b-allblue').addEventListener('click',()=>recolorAll('bleu'));
 $('#b-allbeige').addEventListener('click',()=>recolorAll('beige'));
+
+/* backup export / import */
+function blobToDataUrl(b){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(b);});}
+async function urlToDataUrl(u){try{const r=await fetch(u);if(!r.ok)throw 0;return await blobToDataUrl(await r.blob());}
+  catch(e){try{const im=await loadImg(u);const cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;cv.getContext('2d').drawImage(im,0,0);return cv.toDataURL('image/jpeg',0.9);}catch(e2){return null;}}}
+async function inlineImgs(x){if(Array.isArray(x)){for(let i=0;i<x.length;i++)x[i]=await inlineImgs(x[i]);return x;}
+  if(x&&typeof x==='object'){for(const k of Object.keys(x))x[k]=await inlineImgs(x[k]);return x;}
+  if(typeof x==='string'&&(x.startsWith('/_blob/')||x.startsWith('blob:')||/^https?:\/\/.+\/_blob\//.test(x)))return await urlToDataUrl(x);
+  return x;}
+async function saveFile(blob,name){
+  if(downloads){await downloads.save({filename:name,data:blob});return;}
+  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+$('#b-export').addEventListener('click',async()=>{const b=$('#b-export');if(!posts.length){toast('Ta grille est vide : rien à sauvegarder.');return;}b.disabled=true;
+  try{const out=[];let i=0;for(const p of sorted()){toast(`Préparation de la sauvegarde… (${++i}/${posts.length})`);const {id,...rest}=p;out.push(await inlineImgs(clone(rest)));}
+    const blob=new Blob([JSON.stringify({app:'sur-mon-chemin-studio',version:1,exportedAt:new Date().toISOString(),posts:out})],{type:'application/json'});
+    const d=new Date(),stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    await saveFile(blob,`grille-sur-mon-chemin-${stamp}.json`);toast('Sauvegarde prête. Garde bien ce fichier.');}
+  catch(e){toast(e&&e.code==='declined'?'Sauvegarde annulée.':'La sauvegarde n’a pas pu être créée.');}
+  b.disabled=false;});
+$('#imp-json').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  let json;try{json=JSON.parse(await f.text());}catch(err){toast('Ce fichier n’est pas une sauvegarde de la grille.');return;}
+  const list=Array.isArray(json)?json:json.posts;if(!Array.isArray(list)){toast('Ce fichier n’est pas une sauvegarde de la grille.');return;}
+  const have=new Set(posts.map(p=>`${p.createdAt}|${p.template}`));let n=0,skip=0;
+  const ordered=[...list].sort((a,b)=>(a.pos||0)-(b.pos||0));
+  let nextPos=posts.length?Math.max(...posts.map(x=>x.pos||0))+1:1;
+  for(const p0 of ordered){if(!p0||!p0.thumb){continue;}if(have.has(`${p0.createdAt}|${p0.template}`)){skip++;continue;}
+    const p={...p0};delete p.id;if(mode==='db'&&p.data)p.data=await persistImages(p.data);
+    p.pos=nextPos++;
+    toast(`Chargement… (${++n})`);await storePut(p,true);}
+  toast(n?`${n} post${n>1?'s':''} récupéré${n>1?'s':''}${skip?`, ${skip} déjà présent${skip>1?'s':''}`:''}.`:'Tous ces posts sont déjà dans ta grille.');renderGrid();});
 
 /* phone mockup */
 function renderPhone(){$('#ph-n').textContent=posts.length;$('#ph-grid').innerHTML=tilesHTML('');}
