@@ -254,7 +254,10 @@ function fit(list){const h=OH();if(h===1350)return list;const off=(h-1350)/2;
   return list.map(x=>{if(x.includes('data-native="1"'))return x;const m=x.match(/data-edge="([^"]+)"/)||x.match(/background:([^;]+);/);const edge=m?m[1]:C.S;
     return `<div class="slide" style="width:1080px;height:${h}px;position:relative;overflow:hidden;background:${edge}"><div style="position:absolute;left:0;top:${off}px">${x}</div></div>`;});}
 const FK=0.93333;
-function frameWrap(html,fc,h){const ih=h*FK;return `<div class="slide" data-native="1" style="width:1080px;height:${h}px;position:relative;overflow:hidden;background:${fc}"><div style="position:absolute;left:36px;top:${((h-ih)/2).toFixed(1)}px;width:1008px;height:${ih.toFixed(1)}px;border-radius:24px;overflow:hidden"><div style="position:absolute;left:0;top:0;width:1080px;height:${h}px;transform:scale(${FK});transform-origin:0 0">${html.replace(/ data-edge="[^"]*"/,'')}</div></div></div>`;}
+function frameWrap(html,fc,h,ch){ch=ch||h;const IH=h-72;
+  if(ch===h){const ky=IH/h;return `<div class="slide" data-native="1" style="width:1080px;height:${h}px;position:relative;overflow:hidden;background:${fc}"><div style="position:absolute;left:36px;top:36px;width:1008px;height:${IH}px;border-radius:28px;overflow:hidden"><div style="position:absolute;left:0;top:0;width:1080px;height:${h}px;transform:scale(${FK},${ky.toFixed(5)});transform-origin:0 0">${html}</div></div></div>`;}
+  const m=html.match(/data-edge="([^"]+)"/)||html.match(/background:([^;]+);/);const edge=m?m[1]:C.S;const top=((IH-ch*FK)/2).toFixed(1);
+  return `<div class="slide" data-native="1" style="width:1080px;height:${h}px;position:relative;overflow:hidden;background:${fc}"><div style="position:absolute;left:36px;top:36px;width:1008px;height:${IH}px;border-radius:28px;overflow:hidden;background:${edge}"><div style="position:absolute;left:0;top:${top}px;width:1080px;height:${ch}px;transform:scale(${FK});transform-origin:0 0">${html.replace(/ data-edge="[^"]*"/,'')}</div></div></div>`;}
 function coverBg(d,FW,FH){const sc=Math.max(FW/d.w,FH/d.h)*(+d.zoom||1),W=d.w*sc,H=d.h*sc,X=(FW-W)*(+d.px)/100,Y=(FH-H)*(+d.py)/100;
   return `background:url(${d.photo}) ${X.toFixed(1)}px ${Y.toFixed(1)}px/${W.toFixed(1)}px ${H.toFixed(1)}px no-repeat`;}
 const ADJ=[{k:'zoom',t:'range',l:'Zoom',min:1,max:3,step:.01,fmt:v=>Math.round(v*100)+' %',needs:'photo'},
@@ -340,7 +343,7 @@ T.question={name:'Je réponds à vos questions',desc:'Une question, une réponse
       o+=A('left:80px;right:80px;bottom:64px;display:flex;justify-content:space-between;align-items:center',page(`${i+1} / ${n}`,sub)+pill(last?'Une question ? Posez-la en commentaire':'Glissez →',acc,bg));
       out.push(slide(bg,fg,o));}
     if(d.frame&&d.frame!=='aucun'){const fc=d.frame==='bleu'?C.B:C.S;
-      return out.map(h=>frameWrap(h,fc,1350));}
+      return out.map(h=>frameWrap(h,fc,OH(),1350));}
     return out;}};
 T.avis={name:'Avis des lecteurs',desc:'Les avis en bulles de message.',
   def:()=>({title:'Vos avis me touchent',teasers:'« un bout d’avis »\n« un autre, plus court »\n« et un troisième… »',items:[
