@@ -167,6 +167,8 @@ h2{font-size:20px;line-height:1.2}
       <button class="btn" id="b-phone">Voir comme sur mon téléphone</button>
       <button class="btn" id="b-allblue">Tout en bleu</button>
       <button class="btn" id="b-allbeige">Tout en beige</button>
+      <button class="btn" id="b-frbeige">Contours beiges partout</button>
+      <button class="btn" id="b-frbleu">Contours bleus partout</button>
       <button class="btn" id="b-export">Sauvegarder ma grille</button>
       <label class="btn" for="imp-json">Charger une sauvegarde</label>
       <input id="imp-json" type="file" accept=".json,application/json" hidden>
@@ -319,7 +321,7 @@ T.question={name:'Je réponds à vos questions',desc:'Une question, une réponse
     {text:'J’avais envie de proposer mon ouvrage à un prix accessible et d’écrire à mon rythme.'},
     {text:'… de raconter mon histoire sans la déformer, et de la porter jusqu’au bout en toute fierté.'},
     {text:'Ce n’était pas forcément le chemin le plus simple… mais sans doute le bon choix pour moi.'}]}),
-  fields:[{k:'question',t:'text',l:'Question'},{k:'frame',t:'seg',l:'Contour du post',o:[['aucun','Aucun'],['beige','Beige'],['bleu','Bleu']]},{k:'photo',t:'image',l:'Photo de la 1re slide'},{k:'author',t:'image',l:'Photo ronde de l’auteur (dernière slide)'},
+  fields:[{k:'question',t:'text',l:'Question'},{k:'photo',t:'image',l:'Photo de la 1re slide'},{k:'author',t:'image',l:'Photo ronde de l’auteur (dernière slide)'},
     {k:'items',t:'list',l:'Réponse',item:'Partie',max:8,add:()=>({text:''}),sub:[{k:'text',t:'area',l:'Texte'}]}],
   slides(d,inv){const n=d.items.length, q=esc(d.question).replace(/ \?$/,'&nbsp;?');
     const L=inv?{q:C.B,qt:C.CR,ql:C.S,col:C.S,ct:C.B,cs:C.G,pb:C.B,pf:C.CR,wm:'rgba(46,110,146,.12)'}:{q:C.S,qt:C.B,ql:C.B,col:C.B,ct:C.CR,cs:C.S,pb:C.S,pf:C.B,wm:'rgba(251,246,236,.12)'};
@@ -342,8 +344,6 @@ T.question={name:'Je réponds à vos questions',desc:'Une question, une réponse
       o+=A('left:80px;right:80px;top:230px;bottom:160px;display:flex;flex-direction:column;justify-content:center;gap:44px',body);
       o+=A('left:80px;right:80px;bottom:64px;display:flex;justify-content:space-between;align-items:center',page(`${i+1} / ${n}`,sub)+pill(last?'Une question ? Posez-la en commentaire':'Glissez →',acc,bg));
       out.push(slide(bg,fg,o));}
-    if(d.frame&&d.frame!=='aucun'){const fc=d.frame==='bleu'?C.B:C.S;
-      return out.map(h=>frameWrap(h,fc,OH(),1350));}
     return out;}};
 T.avis={name:'Avis des lecteurs',desc:'Les avis en bulles de message.',
   def:()=>({title:'Vos avis me touchent',teasers:'« un bout d’avis »\n« un autre, plus court »\n« et un troisième… »',items:[
@@ -395,7 +395,7 @@ T.lectures={name:'Lectures du mois',desc:'Les livres recommandés du mois.',
     return out;}};
 T.amazon={name:'Merci pour vos avis',desc:'Remercier et inviter à noter sur Amazon.',
   def:()=>({photo:null,raw:null,w:0,h:0,zoom:1,px:50,py:50,filter:'chaud',frame:'beige',note:4.8,title:'Merci à vous !',text:'Afin que ce roman puisse poursuivre son chemin, vos avis comptent énormément.',button:'Laissez une note sur Amazon',small:'Lien en bio · une minute suffit'}),
-  fields:[{k:'photo',t:'image',l:'Photo',adj:true},...ADJ,{k:'frame',t:'seg',l:'Contour du post',o:[['aucun','Aucun'],['beige','Beige'],['bleu','Bleu']]},{k:'note',t:'num',l:'Note Amazon',min:0,max:5,step:.1},{k:'title',t:'text',l:'Titre'},{k:'text',t:'area',l:'Phrase'},{k:'button',t:'text',l:'Bouton'},{k:'small',t:'text',l:'Petite ligne'}],
+  fields:[{k:'photo',t:'image',l:'Photo',adj:true},...ADJ,{k:'note',t:'num',l:'Note Amazon',min:0,max:5,step:.1},{k:'title',t:'text',l:'Titre'},{k:'text',t:'area',l:'Phrase'},{k:'button',t:'text',l:'Bouton'},{k:'small',t:'text',l:'Petite ligne'}],
   slides(d,inv){const bg=inv?C.S:C.B,fg=inv?C.B:C.CR,acc=inv?C.B:C.S,band=inv?C.B:C.S,bt=inv?C.CR:C.B;
     const fade=inv?'rgba(244,236,221,0)':'rgba(46,110,146,0)';
     const nt=(Math.round((+d.note||0)*10)/10).toFixed(1).replace('.',',');
@@ -408,9 +408,13 @@ T.amazon={name:'Merci pour vos avis',desc:'Remercier et inviter à noter sur Ama
       +A(`left:0;right:0;top:${866+dy}px;display:flex;justify-content:center`,`<div style="background:${band};padding:14px 28px;border-radius:999px;display:flex;align-items:center;gap:18px">${stars(+d.note||0,40,bt)}<span style="font-family:${FD};font-size:34px;color:${bt}">${nt} / 5</span></div>`)
       +A(`left:90px;width:900px;top:${974+dy}px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px`,
         `<h2 style="margin:0;font-family:${FD};font-size:76px;font-weight:400;line-height:1.06;color:${fg}">${esc(d.title)}</h2>`+P(nl(d.text),34,fg,1.3,'font-style:italic')+pill(d.button,acc,inv?C.CR:C.B,22)+K(d.small,inv?C.B:C.CR,16));
-    const sl=slideN(bg,fg,o);
-    return [d.frame&&d.frame!=='aucun'?frameWrap(sl,d.frame==='bleu'?C.B:C.S,OH()):sl];}};
+    return [slideN(bg,fg,o)];}};
 const ORDER=['perso','question','avis','lectures','citation','heure','photo','amazon'];
+const FRAME_FIELD={k:'frame',t:'seg',l:'Contour du post',o:[['aucun','Aucun'],['beige','Beige'],['bleu','Bleu']],h:'Indépendant de la couleur du fond.'};
+ORDER.forEach(k=>{if(k==='photo')return;T[k].fields.unshift(FRAME_FIELD);const d0=T[k].def;T[k].def=()=>Object.assign({frame:'beige'},d0());});
+function renderSlides(tpl,d,inv){const raw=T[tpl].slides(d,inv);const fr=tpl==='photo'?'aucun':(d.frame||'beige');
+  if(fr==='aucun')return fit(raw);const fc=fr==='bleu'?C.B:C.S;
+  return raw.map(h=>h.includes('data-native="1"')?frameWrap(h,fc,OH()):frameWrap(h,fc,OH(),1350));}
 
 /* ---------- state ---------- */
 let S={tpl:'perso',inv:false,data:{}};
@@ -494,13 +498,13 @@ $('#inv').addEventListener('change',e=>{S.inv=e.target.checked;save();renderPrev
 function renderFmt(){document.querySelectorAll('[data-fmt]').forEach(b=>b.setAttribute('aria-pressed',String((S.fmt||'34')===b.dataset.fmt)));
   $('#fmt-note').textContent=(S.fmt==='45')?'Format 4:5 (1080 × 1350 px). Sur Instagram, choisis « Portrait ». Dans la grille du profil, Instagram rogne un peu les bords.':'Format 3:4 (1080 × 1440 px), celui de la grille Instagram : rien n’est rogné sur le profil. Sur Instagram, choisis « Portrait » (3:4).';}
 document.querySelectorAll('[data-fmt]').forEach(b=>b.addEventListener('click',()=>{S.fmt=b.dataset.fmt;save();renderFmt();renderPreview();}));
-const slidesNow=()=>fit(T[S.tpl].slides(cur(),S.inv));
+const slidesNow=()=>renderSlides(S.tpl,cur(),S.inv);
 function renderPreview(){const sl=slidesNow();$('#strip').classList.toggle('photo-mode',canPan());$('#strip').innerHTML=sl.map((h,i)=>`<div class="sbox"><div class="sframe" style="--h:${OH()}">${h}</div><div class="n">${sl.length>1?`Slide ${i+1} sur ${sl.length}`:'Post simple'}</div></div>`).join('');}
 
 let drag=null,raf=0;
 function syncRanges(){['zoom','px','py'].forEach(k=>{const i=document.querySelector(`[data-p="${k}"]`);if(i)i.value=cur()[k];const o=document.querySelector(`[data-out="${k}"]`);const fd=fieldDef(k);if(o&&fd)o.textContent=fd.fmt(cur()[k]);});}
 function quickRender(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const fr=document.querySelector('#strip .sframe');if(fr)fr.innerHTML=slidesNow()[0];});}
-function geom(){const d=cur();if(S.tpl==='photo')return {FW:1008,FH:OH()-72,k:1};if(S.tpl==='amazon')return {FW:1080,FH:1000+OH()-1350,k:(d.frame&&d.frame!=='aucun')?FK:1};return null;}
+function geom(){const d=cur();if(S.tpl==='photo')return {FW:1008,FH:OH()-72,k:1};if(S.tpl==='amazon')return {FW:1080,FH:1000+OH()-1350,k:((d.frame||'beige')!=='aucun')?FK:1};return null;}
 const canPan=()=>!!geom()&&!!cur().photo&&!!cur().w;
 $('#strip').addEventListener('pointerdown',e=>{if(!canPan())return;const fr=e.target.closest('.sframe');if(!fr)return;
   e.preventDefault();fr.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,px:+cur().px,py:+cur().py,k:fr.getBoundingClientRect().width/1080*geom().k,fr};});
@@ -561,7 +565,7 @@ async function persistImages(o){if(!assets)return o;const cache={};
     return x;}
   return walk(o);}
 async function withFmt(fmt,fn){const old=S.fmt;S.fmt=fmt||'34';try{return await fn();}finally{S.fmt=old;}}
-const postSlides=p=>fit(T[p.template].slides(p.data,!!p.inv));
+const postSlides=p=>renderSlides(p.template,p.data,!!p.inv);
 async function postThumb(p){return withFmt(p.fmt,async()=>{const cv=await toCanvas(postSlides(p)[0],1/3);return cv.toDataURL('image/jpeg',0.8);});}
 async function storePut(p,isNew){
   if(mode==='db'){try{if(isNew){await col.add(p);}else{const {id,...rest}=p;await col.doc(id).set(rest);}return true;}
@@ -616,7 +620,7 @@ function openViewer(id){let p;
   $('#v-title').textContent=p.title||'Post';
   const canEdit=id!==null&&p.template!=='import'&&p.data;
   $('#v-acts').innerHTML=id===null?`<button class="btn primary" id="va-add">Ajouter à ma grille</button>`:
-    (canEdit?`<button class="btn" id="va-inv">Inverser les couleurs</button><button class="btn" id="va-edit">Modifier</button>`:`<p class="muted" style="width:100%;text-align:center;font-size:13.5px;margin:0 0 6px">${p.template==='import'?'Post importé : seule l’image est disponible, il ne peut pas être modifié.':'Ce post a été ajouté avant la dernière mise à jour : seule sa miniature a été gardée. Recrée-le dans « Créer un post » pour pouvoir le modifier et inverser ses couleurs.'}</p>`)
+    (canEdit?`${p.template!=='photo'?`<button class="btn" id="va-frame">Contour : ${({aucun:'aucun',beige:'beige',bleu:'bleu'})[p.data.frame||'beige']}</button>`:''}<button class="btn" id="va-inv">Inverser les couleurs</button><button class="btn" id="va-edit">Modifier</button>`:`<p class="muted" style="width:100%;text-align:center;font-size:13.5px;margin:0 0 6px">${p.template==='import'?'Post importé : seule l’image est disponible, il ne peut pas être modifié.':'Ce post a été ajouté avant la dernière mise à jour : seule sa miniature a été gardée. Recrée-le dans « Créer un post » pour pouvoir le modifier et inverser ses couleurs.'}</p>`)
     +`<button class="btn" id="va-up">Avancer</button><button class="btn" id="va-down">Reculer</button><button class="btn danger" id="va-del">Supprimer</button>`;
   $('#viewer').hidden=false;vRender();}
 $('#v-prev').addEventListener('click',()=>{if(V.i>0){V.i--;vRender();}});
@@ -632,6 +636,7 @@ $('#v-acts').addEventListener('click',async e=>{const b=e.target.closest('button
   if(b.id==='va-del'){if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Confirmer la suppression';return;}$('#viewer').hidden=true;await delPost(p.id);toast('Post supprimé.');return;}
   if(b.id==='va-up'){await movePost(p.id,-1);toast('Post avancé.');return;}
   if(b.id==='va-down'){await movePost(p.id,1);toast('Post reculé.');return;}
+  if(b.id==='va-frame'){b.disabled=true;const cyc={beige:'bleu',bleu:'aucun',aucun:'beige'};const np={...p,data:{...clone(p.data),frame:cyc[p.data.frame||'beige']}};try{np.thumb=await postThumb(np);await storePut(np,false);openViewer(p.id);toast('Contour modifié.');}catch(err){toast('Impossible de changer le contour.');}b.disabled=false;return;}
   if(b.id==='va-inv'){b.disabled=true;const np={...p,inv:!p.inv};try{np.thumb=await postThumb(np);await storePut(np,false);openViewer(p.id);toast('Couleurs inversées.');}catch(err){toast('Impossible d’inverser ce post.');}b.disabled=false;return;}
   if(b.id==='va-edit'){S.tpl=p.template;S.data[p.template]=Object.assign(T[p.template].def(),clone(p.data));S.inv=!!p.inv;S.fmt=p.fmt||'34';S.editing=p.id;save();
     $('#viewer').hidden=true;$('#inv').checked=S.inv;renderFmt();renderTpls();renderForm();renderPreview();renderEditbar();location.hash='creer';}});
@@ -649,6 +654,12 @@ async function recolorAll(color){const btns=[$('#b-allblue'),$('#b-allbeige')];b
   btns.forEach(b=>b.disabled=false);
   toast((n?`${n} post${n>1?'s':''} passé${n>1?'s':''} ${color==='bleu'?'en bleu':'en beige'}.`:'Tous les posts sont déjà '+(color==='bleu'?'en bleu.':'en beige.'))+(skipped?' Les posts importés ou anciens ne changent pas.':''));}
 $('#b-allblue').addEventListener('click',()=>recolorAll('bleu'));
+async function reframeAll(fr){const bs=[$('#b-frbeige'),$('#b-frbleu')];bs.forEach(b=>b.disabled=true);let n=0;
+  for(const p of posts.filter(p=>p.data&&T[p.template]&&p.template!=='photo')){if((p.data.frame||'beige')===fr&&p.thumbFramed)continue;
+    const np={...p,thumbFramed:true,data:{...clone(p.data),frame:fr}};toast(`Mise à jour des contours… (${++n})`);try{np.thumb=await postThumb(np);await storePut(np,false);}catch(e){}}
+  bs.forEach(b=>b.disabled=false);toast(n?`Contours ${fr==='bleu'?'bleus':'beiges'} appliqués à ${n} post${n>1?'s':''}.`:'Rien à changer.');}
+$('#b-frbeige').addEventListener('click',()=>reframeAll('beige'));
+$('#b-frbleu').addEventListener('click',()=>reframeAll('bleu'));
 $('#b-allbeige').addEventListener('click',()=>recolorAll('beige'));
 
 /* backup export / import */
