@@ -370,26 +370,32 @@ T.avis={name:'Avis des lecteurs',desc:'Les avis en bulles de message.',
       out.push(slide(bg,fg,o));});
     return out;}};
 T.lectures={name:'Lectures du mois',desc:'Les livres recommandés du mois.',
-  def:()=>({month:'novembre',kicker:'La sélection du mois',subtitle:'Trois livres qui m’ont marqué',books:[
-    {photo:null,title:'Le Petit Prince',author:'Antoine de Saint-Exupéry',avis:'L’avis de David sur ce livre, en deux ou trois lignes.'},
-    {photo:null,title:'Titre du livre 2',author:'Auteur',avis:'L’avis de David sur ce livre.'},
-    {photo:null,title:'Titre du livre 3',author:'Auteur',avis:'L’avis de David sur ce livre.'}]}),
-  fields:[{k:'month',t:'text',l:'Mois'},{k:'kicker',t:'text',l:'Petit titre au-dessus'},{k:'subtitle',t:'text',l:'Phrase sous le titre'},
-    {k:'books',t:'list',l:'Livres',item:'Livre',max:8,add:()=>({photo:null,title:'',author:'',avis:''}),
-     sub:[{k:'photo',t:'image',l:'Photo du livre'},{k:'title',t:'text',l:'Titre'},{k:'author',t:'text',l:'Auteur'},{k:'avis',t:'area',l:'Ton avis'}]}],
+  def:()=>({header:'Carnet de lecture',kicker:'La sélection du mois',title:'Les lectures\nde novembre',subtitle:'Trois livres qui m’ont marqué',booksHeader:'Carnet de lecture · Novembre',books:[
+    {photo:null,shape:'livre',title:'Le Petit Prince',author:'Antoine de Saint-Exupéry',avis:'L’avis de David sur ce livre, en deux ou trois lignes.'},
+    {photo:null,shape:'livre',title:'Titre du livre 2',author:'Auteur',avis:'L’avis de David sur ce livre.'},
+    {photo:null,shape:'livre',title:'Titre du livre 3',author:'Auteur',avis:'L’avis de David sur ce livre.'}]}),
+  fields:[{k:'header',t:'text',l:'Petit texte tout en haut (couverture)'},{k:'kicker',t:'text',l:'Petit titre au-dessus du titre'},
+    {k:'title',t:'area',l:'Titre',h:'Va à la ligne pour couper le titre où tu veux.'},{k:'subtitle',t:'text',l:'Phrase sous le titre'},
+    {k:'booksHeader',t:'text',l:'Petit texte en haut des slides de livres'},
+    {k:'books',t:'list',l:'Livres',item:'Livre',max:8,add:()=>({photo:null,shape:'livre',title:'',author:'',avis:''}),
+     sub:[{k:'photo',t:'image',l:'Photo du livre'},{k:'shape',t:'seg',l:'Format de la photo',o:[['livre','Couverture de livre'],['carre','Carré']]},{k:'title',t:'text',l:'Titre'},{k:'author',t:'text',l:'Auteur'},{k:'avis',t:'area',l:'Ton avis'}]}],
   slides(d,inv){const n=d.books.length+1;
+    const title=d.title!=null?d.title:('Les lectures\nde '+(d.month||''));
     const cb=inv?C.S:C.B,cf=inv?C.B:C.CR,ca=inv?C.B:C.S;
-    let cov=A('left:80px;right:80px;top:80px;text-align:center',K('Carnet de lecture',ca,20))
+    const tl=title.length, tsz=tl>60?80:tl>40?96:116;
+    let cov=(d.header?A('left:80px;right:80px;top:80px;text-align:center',K(d.header,ca,20)):'')
       +A('left:90px;right:90px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:30px',
-        K(d.kicker,ca,22)+`<h1 style="margin:0;font-family:${FD};font-size:116px;font-weight:400;line-height:1.06;color:${inv?C.B:C.CR}">Les lectures<br>de ${esc(d.month)}</h1>`+`<div style="width:60px;border-top:2.5px solid ${ca}"></div>`+P(esc(d.subtitle),36,cf,1.3))
+        (d.kicker?K(d.kicker,ca,22):'')+`<h1 style="margin:0;font-family:${FD};font-size:${tsz}px;font-weight:400;line-height:1.06;color:${inv?C.B:C.CR}">${nl(title)}</h1>`+`<div style="width:60px;border-top:2.5px solid ${ca}"></div>`+(d.subtitle?P(esc(d.subtitle),36,cf,1.3):''))
       +A('left:0;right:0;bottom:70px;display:flex;justify-content:center;align-items:center;gap:36px',page('1 / '+n,inv?C.B:C.CR)+pill('Glissez →',ca,cb));
     const out=[slide(cb,cf,cov)];
     const bg=inv?C.B:C.S,fg=inv?C.CR:C.N,acc=inv?C.S:C.B,sub=inv?CRa:C.G;
-    d.books.forEach((b,i)=>{
-      const ph=b.photo?`<div style="width:560px;height:560px;border-radius:24px;background:url(${b.photo}) center/cover no-repeat"></div>`:`<div style="width:560px;height:560px;border-radius:24px;background:${inv?'#3E7A9C':'#E6DAC4'};display:flex;align-items:center;justify-content:center;font-size:24px;color:${sub}">Photo du livre</div>`;
-      let o=A('left:80px;right:80px;top:80px;text-align:center',K('Carnet de lecture · '+capit(d.month),acc,20))
-        +A('left:110px;right:110px;top:170px;bottom:140px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:26px',
-          ph+`<h2 style="margin:12px 0 0;font-family:${FD};font-size:64px;font-weight:400;line-height:1.06;color:${acc}">${esc(b.title)}</h2>`+K(b.author,fg,20)+`<div style="width:60px;border-top:2.5px solid ${acc}"></div>`+P('«&nbsp;'+nl(b.avis)+'&nbsp;»',32,fg,1.32,'font-style:italic'))
+    const bh=d.booksHeader!=null?d.booksHeader:('Carnet de lecture · '+capit(d.month||''));
+    d.books.forEach((b,i)=>{const book=b.shape!=='carre',W=book?400:560,H=book?600:560;
+      const ph=b.photo?`<div style="width:${W}px;height:${H}px;border-radius:${book?10:24}px;background:url(${b.photo}) center/cover no-repeat"></div>`:`<div style="width:${W}px;height:${H}px;border-radius:${book?10:24}px;background:${inv?'#3E7A9C':'#E6DAC4'};display:flex;align-items:center;justify-content:center;font-size:24px;color:${sub}">Photo du livre</div>`;
+      const al=(b.avis||'').length, asz=al>220?26:al>140?28:32;
+      let o=(bh?A('left:80px;right:80px;top:80px;text-align:center',K(bh,acc,20)):'')
+        +A(`left:110px;right:110px;top:150px;bottom:130px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:${book?22:26}px`,
+          ph+`<h2 style="margin:12px 0 0;font-family:${FD};font-size:${book?58:64}px;font-weight:400;line-height:1.06;color:${acc}">${esc(b.title)}</h2>`+(b.author?K(b.author,fg,20):'')+`<div style="width:60px;border-top:2.5px solid ${acc}"></div>`+(b.avis?P('«&nbsp;'+nl(b.avis)+'&nbsp;»',asz,fg,1.32,'font-style:italic'):''))
         +A('left:0;right:0;bottom:70px;text-align:center',page(`${i+2} / ${n}`,sub));
       out.push(slide(bg,fg,o));});
     return out;}};
