@@ -390,11 +390,11 @@ T.lectures={name:'Lectures du mois',desc:'Les livres recommandés du mois.',
     const out=[slide(cb,cf,cov)];
     const bg=inv?C.B:C.S,fg=inv?C.CR:C.N,acc=inv?C.S:C.B,sub=inv?CRa:C.G;
     const bh=d.booksHeader!=null?d.booksHeader:('Carnet de lecture · '+capit(d.month||''));
-    d.books.forEach((b,i)=>{const book=b.shape!=='carre',W=book?400:560,H=book?600:560;
+    d.books.forEach((b,i)=>{const book=b.shape!=='carre',W=book?500:620,H=book?750:620;
       const ph=b.photo?`<div style="width:${W}px;height:${H}px;border-radius:${book?10:24}px;background:url(${b.photo}) center/cover no-repeat"></div>`:`<div style="width:${W}px;height:${H}px;border-radius:${book?10:24}px;background:${inv?'#3E7A9C':'#E6DAC4'};display:flex;align-items:center;justify-content:center;font-size:24px;color:${sub}">Photo du livre</div>`;
       const al=(b.avis||'').length, asz=al>220?26:al>140?28:32;
       let o=(bh?A('left:80px;right:80px;top:80px;text-align:center',K(bh,acc,20)):'')
-        +A(`left:110px;right:110px;top:150px;bottom:130px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:${book?22:26}px`,
+        +A(`left:110px;right:110px;top:130px;bottom:120px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:${book?18:24}px`,
           ph+`<h2 style="margin:12px 0 0;font-family:${FD};font-size:${book?58:64}px;font-weight:400;line-height:1.06;color:${acc}">${esc(b.title)}</h2>`+(b.author?K(b.author,fg,20):'')+`<div style="width:60px;border-top:2.5px solid ${acc}"></div>`+(b.avis?P('«&nbsp;'+nl(b.avis)+'&nbsp;»',asz,fg,1.32,'font-style:italic'):''))
         +A('left:0;right:0;bottom:70px;text-align:center',page(`${i+2} / ${n}`,sub));
       out.push(slide(bg,fg,o));});
