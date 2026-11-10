@@ -370,13 +370,15 @@ T.avis={name:'Avis des lecteurs',desc:'Les avis en bulles de message.',
       out.push(slide(bg,fg,o));});
     return out;}};
 T.lectures={name:'Lectures du mois',desc:'Les livres recommandés du mois.',
-  def:()=>({header:'Carnet de lecture',kicker:'La sélection du mois',title:'Les lectures\nde novembre',subtitle:'Trois livres qui m’ont marqué',booksHeader:'Carnet de lecture · Novembre',books:[
+  def:()=>({header:'Carnet de lecture',kicker:'La sélection du mois',title:'Les lectures\nde novembre',subtitle:'Trois livres qui m’ont marqué',booksHeader:'Carnet de lecture · Novembre',avisItalic:'oui',avisQuotes:'oui',books:[
     {photo:null,shape:'livre',title:'Le Petit Prince',author:'Antoine de Saint-Exupéry',avis:'L’avis de David sur ce livre, en deux ou trois lignes.'},
     {photo:null,shape:'livre',title:'Titre du livre 2',author:'Auteur',avis:'L’avis de David sur ce livre.'},
     {photo:null,shape:'livre',title:'Titre du livre 3',author:'Auteur',avis:'L’avis de David sur ce livre.'}]}),
   fields:[{k:'header',t:'text',l:'Petit texte tout en haut (couverture)'},{k:'kicker',t:'text',l:'Petit titre au-dessus du titre'},
     {k:'title',t:'area',l:'Titre',h:'Va à la ligne pour couper le titre où tu veux.'},{k:'subtitle',t:'text',l:'Phrase sous le titre'},
     {k:'booksHeader',t:'text',l:'Petit texte en haut des slides de livres'},
+    {k:'avisItalic',t:'seg',l:'Ton avis en italique',o:[['oui','Oui'],['non','Non']]},
+    {k:'avisQuotes',t:'seg',l:'Guillemets autour de ton avis',o:[['oui','Oui'],['non','Non']]},
     {k:'books',t:'list',l:'Livres',item:'Livre',max:8,add:()=>({photo:null,shape:'livre',title:'',author:'',avis:''}),
      sub:[{k:'photo',t:'image',l:'Photo du livre'},{k:'shape',t:'seg',l:'Format de la photo',o:[['livre','Couverture de livre'],['carre','Carré']]},{k:'title',t:'text',l:'Titre'},{k:'author',t:'text',l:'Auteur'},{k:'avis',t:'area',l:'Ton avis'}]}],
   slides(d,inv){const n=d.books.length+1;
@@ -395,7 +397,7 @@ T.lectures={name:'Lectures du mois',desc:'Les livres recommandés du mois.',
       const al=(b.avis||'').length, asz=al>220?26:al>140?28:32;
       let o=(bh?A('left:80px;right:80px;top:80px;text-align:center',K(bh,acc,20)):'')
         +A(`left:110px;right:110px;top:130px;bottom:120px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:${book?18:24}px`,
-          ph+`<h2 style="margin:12px 0 0;font-family:${FD};font-size:${book?58:64}px;font-weight:400;line-height:1.06;color:${acc}">${esc(b.title)}</h2>`+(b.author?K(b.author,fg,20):'')+`<div style="width:60px;border-top:2.5px solid ${acc}"></div>`+(b.avis?P('«&nbsp;'+nl(b.avis)+'&nbsp;»',asz,fg,1.32,'font-style:italic'):''))
+          ph+`<h2 style="margin:12px 0 0;font-family:${FD};font-size:${book?58:64}px;font-weight:400;line-height:1.06;color:${acc}">${esc(b.title)}</h2>`+(b.author?K(b.author,fg,20):'')+`<div style="width:60px;border-top:2.5px solid ${acc}"></div>`+(b.avis?P((d.avisQuotes==='non'?'':'«&nbsp;')+nl(b.avis)+(d.avisQuotes==='non'?'':'&nbsp;»'),asz,fg,1.32,d.avisItalic==='non'?'':'font-style:italic'):''))
         +A('left:0;right:0;bottom:70px;text-align:center',page(`${i+2} / ${n}`,sub));
       out.push(slide(bg,fg,o));});
     return out;}};
